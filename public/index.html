@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f8fc">
+<title>CastWave - Stream Screen, Movies and Voice to Any Screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="brand" id="homeBtn" aria-label="CastWave home">
+      <i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 16a6 6 0 0 1 6 6M2 12a10 10 0 0 1 10 10M2 20h.01"/><path d="M4 8V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/></svg></i>CastWave
+    </button>
+    <div class="header-right">
+      <google-cast-launcher id="gCastLauncher" class="gcast-btn" title="Chromecast and Google TV"></google-cast-launcher>
+      <div class="me"><span class="dot" id="srvDot"></span><span id="meLabel"></span></div>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <section id="vHome" class="stack">
+    <div class="hero">
+      <h1>Put what is on your phone <em>on the big screen.</em></h1>
+      <p class="lede">Cast high-speed video, whole screens, and live voice talk directly to your TV, laptop, tablet, or Chromecast with zero lag.</p>
+    </div>
+    
+    <div class="choose">
+      <button class="big" id="goReceive">
+        <span class="tag">This device is the screen</span>
+        <b>Receive a cast</b>
+        <span>For the TV, laptop or tablet you want to watch on. Shows a 6-digit code, a QR code, and appears as a nearby screen.</span>
+        <span class="go">Start as screen</span>
+      </button>
+      <button class="big" id="goSend">
+        <span class="tag">This device is the remote</span>
+        <b>Cast to a screen</b>
+        <span>Send your whole screen, camera, or movie files with real-time voice talking mixed over the TV audio.</span>
+        <span class="go">Find a screen</span>
+      </button>
+    </div>
+
+    <!-- Direct Chromecast Action -->
+    <div class="chromecast-banner">
+      <div class="cc-info">
+        <b>Have a Chromecast or Smart TV?</b>
+        <p>Connect instantly to any Google TV, Chromecast, Android TV, or AirPlay receiver on your network.</p>
+      </div>
+      <button class="btn accent" id="chromecastDirectBtn">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><line x1="2" y1="20" x2="2.01" y2="20"/></svg>
+        <span>Cast to Chromecast / TV</span>
+      </button>
+    </div>
+
+    <div class="routes" aria-label="Supported routes">
+      <span>Phone to TV</span><span>Laptop to TV</span><span>Tablet to TV</span>
+      <span>Chromecast and Android TV</span><span>AirPlay and Smart TVs</span><span>Phone to Laptop</span>
+    </div>
+    <div class="help">
+      <div><b>Ultra Fast Direct Streaming</b><p>Starts in under 1 second. No waiting for long file transfers or black screens.</p></div>
+      <div><b>Live Voice Over TV</b><p>Speak into your microphone anytime. Turn mic on or off with one tap while video plays.</p></div>
+      <div><b>Chromecast and WebRTC</b><p>Direct peer to peer connection for phones and laptops, plus Google Cast for smart TVs.</p></div>
+    </div>
+  </section>
+
+  <!-- RECEIVER -->
+  <section id="vRecv" class="stack" hidden>
+    <div class="stage" id="stage">
+      <video id="rxVideo" playsinline autoplay muted></video>
+      <div class="idle" id="rxIdle"><div class="idle-in">
+        <div class="code"><small>Cast code</small><span id="rxCode">000000</span></div>
+        <img id="qr" alt="QR code to join this screen" width="132" height="132" hidden>
+        <div class="status light"><span class="dot wait" id="rxDot"></span><span id="rxStatus">Connecting...</span></div>
+      </div></div>
+      <div class="overlay" id="rxRing" hidden><div class="ring">
+        <div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h2 id="ringName">A phone</h2>
+        <p class="note">wants to cast to this screen</p>
+        <div class="row center"><button class="btn bad" id="rxDecline">Decline</button><button class="btn ok" id="rxAccept">Accept</button></div>
+      </div></div>
+      <div class="overlay audio-prompt" id="rxUnmute" hidden><button class="btn accent" id="rxUnmuteBtn">Tap to enable TV sound</button></div>
+      <div class="chip" id="rxChip" hidden></div>
+      <button class="chip r" id="fsBtn" title="Toggle Fullscreen">Full screen</button>
+      <div class="bar" id="rxBar" hidden><i></i></div>
+    </div>
+    <div class="card">
+      <div class="row between">
+        <div class="status"><span class="dot" id="rxDot2"></span><span id="rxStatus2">Waiting for a device</span></div>
+        <button class="btn bad" id="rxEnd" hidden>End cast</button>
+      </div>
+      <div class="field">
+        <label class="lbl" for="screenName">Screen name (shown to nearby devices)</label>
+        <input type="text" id="screenName" maxlength="40" autocomplete="off">
+      </div>
+      <div class="field" id="sinkWrap" hidden>
+        <label class="lbl" for="sinkSel">Play sound through</label>
+        <div class="row"><select id="sinkSel" class="grow"></select><button class="btn" id="sinkPerm">Show speaker names</button></div>
+      </div>
+      <p class="note">On a smart TV, open CastWave in the TV browser (Chrome, Silk, Google TV, or Android TV), or scan the QR code with your phone.</p>
+    </div>
+  </section>
+
+  <!-- SENDER -->
+  <section id="vSend" class="stack" hidden>
+    <div class="card" id="joinCard">
+      <div class="row between"><h2>Screens near you</h2><span class="status"><span class="dot wait" id="scanDot"></span><span id="scanTxt">Looking...</span></span></div>
+      <ul class="nearby" id="nearby"></ul>
+      <div class="divider"><span>or enter the code on the screen</span></div>
+      <input type="text" id="codeIn" class="codein" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="000000" aria-label="Six digit cast code">
+      <button class="btn accent wide" id="joinBtn">Connect</button>
+      <div class="status"><span class="dot" id="txDot"></span><span id="txStatus">You can also scan the QR code on the screen with your camera.</span></div>
+    </div>
+
+    <div class="card" id="srcCard" hidden>
+      <div class="row between"><h2>What do you want to cast?</h2><button class="btn bad" id="txEnd">Disconnect</button></div>
+      <div class="sources">
+        <button class="src" id="sFile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>
+          <b>Movie or video file</b>
+          <span>Instant stream movie with picture and audio straight to TV.</span>
+        </button>
+        <button class="src" id="sScreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <b>Screen or tab</b>
+          <span>Mirror whole screen, display, window or tab with sound.</span>
+        </button>
+        <button class="src" id="sCam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          <b>Camera</b>
+          <span>Show your camera live on the screen.</span>
+        </button>
+      </div>
+      
+      <!-- Voice Over / Mic Quick Settings -->
+      <div class="voice-card">
+        <div class="row between">
+          <label class="check">
+            <input type="checkbox" id="micChk" checked>
+            <span><b>Enable microphone voice talk</b></span>
+          </label>
+          <span class="badge">Voice Talk</span>
+        </div>
+        <p class="note">Allows speaking into your phone or laptop microphone while casting. You can toggle the microphone ON or OFF anytime using the remote button.</p>
+      </div>
+
+      <input type="file" id="fileIn" accept="video/*,audio/*,.mkv,.mp4,.webm,.mov,.m4v,.avi" hidden>
+      <p class="note" id="srcNote"></p>
+    </div>
+
+    <div class="card" id="remoteCard" hidden>
+      <div class="row between"><h2 id="nowTitle" class="ellipsis">Now casting</h2><button class="btn" id="stopCast">Stop casting</button></div>
+      <video id="preview" playsinline muted hidden></video>
+      <div id="xferWrap" hidden>
+        <div class="time"><span id="xferTxt">Streaming to TV...</span><span id="xferPct">Live</span></div>
+        <div class="progress"><i id="xferBar" style="width:100%"></i></div>
+      </div>
+      <div class="remote" id="remote">
+        <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek">
+        <div class="time"><span id="tCur">0:00</span><span id="tDur">0:00</span></div>
+        <div class="transport">
+          <button class="round" id="back10" aria-label="Back 10 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+          <button class="round main" id="playBtn" aria-label="Play or pause"><svg id="playIco" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+          <button class="round" id="fwd10" aria-label="Forward 10 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></button>
+        </div>
+
+        <!-- Prominent Microphone Talk Button -->
+        <div class="mic-toggle-banner">
+          <div class="mic-status-text">
+            <span class="mic-indicator" id="micIndicator"></span>
+            <div>
+              <b id="micStatusTitle">Microphone is ON</b>
+              <p id="micStatusSub">Your voice is playing through the TV speaker</p>
+            </div>
+          </div>
+          <button class="btn-mic-toggle active" id="liveMicToggle">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            <span id="liveMicText">Turn Mic OFF</span>
+          </button>
+        </div>
+
+        <div class="audio-mixer-grid">
+          <div class="mixer-col">
+            <label class="lbl" for="vol">TV Sound Volume</label>
+            <input type="range" id="vol" min="0" max="100" value="100">
+          </div>
+          <div class="mixer-col">
+            <label class="lbl" for="micVol">Your Voice Volume</label>
+            <input type="range" id="micVol" min="0" max="100" value="100">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<!-- Google Cast Framework -->
+<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+<script src="/vendor/peerjs.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
